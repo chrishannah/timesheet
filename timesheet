@@ -18,9 +18,8 @@ help(){
     echo "Subcommands:"
     echo "    curr   display current project"
     echo "    proj   list available projects"
-    echo ""
-    echo "For help with each subcommand run:"
-    echo "$exec_name <subcommand> -h|--help"
+    echo "    set    switch to a new project"
+    echo "    add    add a new project"
     echo ""
 }
 

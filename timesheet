@@ -23,7 +23,6 @@ help(){
     echo ""
 }
 
-# display current project
 curr(){
     current_project=$(sed -n '1p' "$curr_file")
     start_time=$(sed -n '2p' "$curr_file")
@@ -45,7 +44,6 @@ curr(){
     echo "Duration: ${BOLD}$time${END}" 
 }
 
-# list available projects
 proj(){
     echo -ne "${BOLD}${RED}Current projects:${END} \n"
 
@@ -53,6 +51,22 @@ proj(){
         ((line_number++))
         echo -e "${BOLD}$line${END}"
     done < "$proj_file"
+}
+
+add(){
+    echo "Enter new project name:"
+    read new_proj
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        ((line_number++))
+        if [[ "$line" == "$new_proj" ]]; then
+            echo "Project already added"
+            exit
+        fi
+    done < "$proj_file"
+
+    echo $new_proj >> $proj_file
+    echo "Added project: ${BOLD}$new_proj${END}"
 }
 
 set(){

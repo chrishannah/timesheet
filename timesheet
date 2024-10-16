@@ -1,0 +1,93 @@
+#! /usr/bin/env zsh
+
+exec_name=$(basename $0)
+
+# files
+curr_file=".current"
+proj_file="projects.txt"
+
+# colours
+BOLD=$(tput bold)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+END=$(tput sgr0)
+
+# usage instructions
+help(){
+    echo "Usage: $exec_name <subcommand> [options]\n"
+    echo "Subcommands:"
+    echo "    curr   display current project"
+    echo "    proj   list available projects"
+    echo ""
+    echo "For help with each subcommand run:"
+    echo "$exec_name <subcommand> -h|--help"
+    echo ""
+}
+
+# display current project
+curr(){
+    current_project=$(sed -n '1p' "$curr_file")
+    start_time=$(sed -n '2p' "$curr_file")
+
+    min=$(date -jf "%Y-%m-%d %H:%M:%S" "$start_time" +%s)
+    current_time=$(date +"%Y-%m-%d %H:%M:%S")
+    now=$(date -jf "%Y-%m-%d %H:%M:%S" "$current_time" +%s)
+    secs=$(( $now - $min ))
+    mins=$(( $secs / 60 ))
+
+    if (( $mins > 60 )); then
+        hours=$((mins/60))
+        time="$hours hours"
+    else 
+        time="$mins mins"
+    fi
+
+    echo "Current project: ${BOLD}$current_project${END}"
+    echo "Duration: ${BOLD}$time${END}" 
+}
+
+# list available projects
+proj(){
+    echo -ne "${BOLD}${RED}Current projects:${END} \n"
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        ((line_number++))
+        echo -e "${BOLD}$line${END}"
+    done < "$proj_file"
+}
+
+set(){
+    selected_row=$(cat "$proj_file" | fzf --height 40% --reverse)
+
+    if [[ -z "$selected_row" ]]; then
+        echo "No row selected."
+        exit 0
+    fi
+
+    sed -i '' "1s/.*/$selected_row/" "$curr_file"
+
+    current_time=$(date +"%Y-%m-%d %H:%M:%S")
+    sed -i '' "2s/.*/$current_time/" "$curr_file"
+
+
+    echo "Selected project: $selected_row"
+}
+
+
+
+subcommand=$1
+case $subcommand in
+    "" | "-h" | "--help")
+        help
+        ;;
+    *)
+        shift
+        ${subcommand} $@
+        if [ $? = 127 ]; then
+            echo "Error: '$subcommand' is not a known subcommand." >&2
+            echo "       Run '$exec_name --help' for a list of known subcommands." >&2
+            exit 1
+        fi
+        ;;
+esac
+

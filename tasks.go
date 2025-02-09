@@ -129,3 +129,15 @@ func printCurrentTask() {
 	}
 	fmt.Println("Error: Current task not found in the task list")
 }
+
+func deleteTask(taskID int) {
+    for i, task := range taskData.Tasks {
+        if task.ID == taskID {
+            taskData.Tasks = append(taskData.Tasks[:i], taskData.Tasks[i+1:]...)
+            fmt.Printf("Task with ID %d has been deleted\n", taskID)
+            saveTaskData()
+            return
+        }
+    }
+    fmt.Printf("Task with ID %d not found\n", taskID)
+}

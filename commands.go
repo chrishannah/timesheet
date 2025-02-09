@@ -97,10 +97,30 @@ var renameCmd = &cobra.Command{
     },
 }
 
+var deleteCmd = &cobra.Command{
+    Use:   "delete [id]",
+    Short: "Delete a task by its ID",
+    Long:  "Delete a task from the timesheet by specifying its ID",
+    Run: func(cmd *cobra.Command, args []string) {
+        if len(args) < 1 {
+            fmt.Println("Please provide a task ID")
+            return
+        }
+
+        taskID, err := strconv.Atoi(args[0])
+        if err != nil {
+            fmt.Println("Invalid task ID. Please provide a number.")
+            return
+        }
+
+        deleteTask(taskID)
+    },
+}
+
 func init() {
     // Add the force flag to the reset command
     resetCmd.Flags().BoolP("force", "f", false, "Delete all tasks instead of just resetting times")
 
-	rootCmd.AddCommand(addCmd, listCmd, resetCmd, startCmd, stopCmd, currentCmd, renameCmd)
+	rootCmd.AddCommand(addCmd, deleteCmd, listCmd, resetCmd, startCmd, stopCmd, currentCmd, renameCmd)
 
 }

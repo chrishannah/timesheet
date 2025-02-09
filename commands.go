@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -40,22 +41,32 @@ var resetCmd = &cobra.Command{
 }
 
 var startCmd = &cobra.Command{
-    Use:   "start [id]",
+    Use:   "start",
     Short: "Start timer for a task",
-    Long:  `Start the timer for a task with the given ID. If a timer is already running for another task, it will be stopped first.`,
+    Long:  `Start the timer from a list of already defined tasks.`,
     Run: func(cmd *cobra.Command, args []string) {
-        if len(args) < 1 {
-            fmt.Println("Please provide a task ID")
-            return
+
+        templates := &promptui.SelectTemplates{
+            Label:    "{{ .Description }}",
+            Active:   "\U00002605 {{ .Description | cyan }}",
+            Inactive: "  {{ .Description | cyan }}",
+            Selected: "\U00002605 {{ .Description | red | cyan }}",
         }
 
-        taskID, err := strconv.Atoi(args[0])
+        prompt := promptui.Select{
+            Label: "Select a task",
+            Items: taskData.Tasks,
+            Templates: templates,
+        }
+
+        index, _, err := prompt.Run()
         if err != nil {
-            fmt.Println("Invalid task ID. Please provide a number.")
+            fmt.Printf("Prompt failed %v\n", err)
             return
         }
 
-        startTask(taskID)
+        task := taskData.Tasks[index]
+        startTask(task.ID)
     },
 }
 

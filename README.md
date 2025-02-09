@@ -39,10 +39,10 @@ timesheet delete 1
 timesheet rename 1 "New project name"
 ````
 
-**Start a task timer** (by it's ID found via list):
+**Start a task timer**:
 
 ````bash
-timesheet start 1
+timesheet start
 ````
 
 **Stop the current task timer**:

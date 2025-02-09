@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -77,23 +76,36 @@ var currentCmd = &cobra.Command{
 }
 
 var renameCmd = &cobra.Command{
-    Use:   "rename [id] [new name]",
+    Use:   "rename",
     Short: "Rename a task",
-    Long:  "Rename a task by providing its ID and the new name",
+    Long:  "Rename a task by selecting from a list of tasks, and providing a  new name",
     Run: func(cmd *cobra.Command, args []string) {
-        if len(args) < 2 {
-            fmt.Println("Please provide a task ID and a new name")
-            return
-        }
 
-        taskID, err := strconv.Atoi(args[0])
+        select_prompt := buildTaskSelectPrompt()
+        index, _, err := select_prompt.Run()
+
         if err != nil {
-            fmt.Println("Invalid task ID. Please provide a number.")
+            fmt.Printf("Prompt failed %v\n", err)
             return
         }
 
-        newName := args[1]
-        renameTask(taskID, newName)
+        name_prompt := promptui.Prompt{
+            Label:    "New name",
+        }
+        name, err := name_prompt.Run()
+
+        if err != nil {
+            fmt.Printf("Prompt failed %v\n", err)
+            return
+        }
+
+        if len(name) < 1 {
+            fmt.Println("Please provide a new name for the task")
+            return
+        }
+
+        task := taskData.Tasks[index]
+        renameTask(task.ID, name)
     },
 }
 

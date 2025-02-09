@@ -46,20 +46,9 @@ var startCmd = &cobra.Command{
     Long:  `Start the timer from a list of already defined tasks.`,
     Run: func(cmd *cobra.Command, args []string) {
 
-        templates := &promptui.SelectTemplates{
-            Label:    "{{ .Description }}",
-            Active:   "\U00002605 {{ .Description | cyan }}",
-            Inactive: "  {{ .Description | cyan }}",
-            Selected: "\U00002605 {{ .Description | red | cyan }}",
-        }
-
-        prompt := promptui.Select{
-            Label: "Select a task",
-            Items: taskData.Tasks,
-            Templates: templates,
-        }
-
+        prompt := buildTaskSelectPrompt()
         index, _, err := prompt.Run()
+
         if err != nil {
             fmt.Printf("Prompt failed %v\n", err)
             return
@@ -109,22 +98,20 @@ var renameCmd = &cobra.Command{
 }
 
 var deleteCmd = &cobra.Command{
-    Use:   "delete [id]",
-    Short: "Delete a task by its ID",
-    Long:  "Delete a task from the timesheet by specifying its ID",
+    Use:   "delete ",
+    Short: "Delete a task",
+    Long:  "Delete a task from the list of already defined tasks",
     Run: func(cmd *cobra.Command, args []string) {
-        if len(args) < 1 {
-            fmt.Println("Please provide a task ID")
-            return
-        }
+        prompt := buildTaskSelectPrompt()
+        index, _, err := prompt.Run()
 
-        taskID, err := strconv.Atoi(args[0])
         if err != nil {
-            fmt.Println("Invalid task ID. Please provide a number.")
+            fmt.Printf("Prompt failed %v\n", err)
             return
         }
 
-        deleteTask(taskID)
+        task := taskData.Tasks[index]
+        deleteTask(task.ID)
     },
 }
 
@@ -134,4 +121,21 @@ func init() {
 
 	rootCmd.AddCommand(addCmd, deleteCmd, listCmd, resetCmd, startCmd, stopCmd, currentCmd, renameCmd)
 
+}
+
+func buildTaskSelectPrompt() promptui.Select {
+    templates := &promptui.SelectTemplates{
+        Label:    "{{ .Description }}",
+        Active:   "\U00002605 {{ .Description | cyan }}",
+        Inactive: "  {{ .Description | cyan }}",
+        Selected: "\U00002605 {{ .Description | red | cyan }}",
+    }
+
+    prompt := promptui.Select{
+        Label: "Select a task",
+        Items: taskData.Tasks,
+        Templates: templates,
+    }
+
+    return prompt
 }

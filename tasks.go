@@ -135,9 +135,16 @@ func deleteTask(taskID int) {
         if task.ID == taskID {
             taskData.Tasks = append(taskData.Tasks[:i], taskData.Tasks[i+1:]...)
             fmt.Printf("Task with ID %d has been deleted\n", taskID)
+            regenerateTaskIds()
             saveTaskData()
             return
         }
     }
     fmt.Printf("Task with ID %d not found\n", taskID)
+}
+
+func regenerateTaskIds() {
+    for i := range taskData.Tasks {
+        taskData.Tasks[i].ID = i + 1
+    }
 }

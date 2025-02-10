@@ -6,77 +6,77 @@ import (
 )
 
 type Task struct {
-    ID          int
-    Description string
-    TotalTime   time.Duration
-    StartTime   time.Time
+	ID          int
+	Description string
+	TotalTime   time.Duration
+	StartTime   time.Time
 }
 
 type TaskData struct {
-    Tasks         []Task
-    CurrentTaskID int
+	Tasks         []Task
+	CurrentTaskID int
 }
 
 var taskData TaskData
 
 func resetTasks(force bool) {
 	if force {
-        // Delete all tasks
-        taskData.Tasks = []Task{}
-        fmt.Println("All tasks have been deleted.")
-    } else {
-        // Reset times for all tasks
-        for i := range taskData.Tasks {
-            taskData.Tasks[i].TotalTime = 0
-            taskData.Tasks[i].StartTime = time.Time{}
-        }
-        fmt.Println("Task times have been reset.")
-    }
+		// Delete all tasks
+		taskData.Tasks = []Task{}
+		fmt.Println("All tasks have been deleted.")
+	} else {
+		// Reset times for all tasks
+		for i := range taskData.Tasks {
+			taskData.Tasks[i].TotalTime = 0
+			taskData.Tasks[i].StartTime = time.Time{}
+		}
+		fmt.Println("Task times have been reset.")
+	}
 
-    saveTaskData()
+	saveTaskData()
 }
 
 func startTask(taskID int) {
-    if taskData.CurrentTaskID != 0 {
-        stopTask()
-    }
+	if taskData.CurrentTaskID != 0 {
+		stopTask()
+	}
 
-    for i := range taskData.Tasks {
-        if taskData.Tasks[i].ID == taskID {
-            taskData.Tasks[i].StartTime = time.Now()
-            taskData.CurrentTaskID = taskID
-            fmt.Printf("Started timer for task: %s\n", taskData.Tasks[i].Description)
-            saveTaskData()
-            return
-        }
-    }
+	for i := range taskData.Tasks {
+		if taskData.Tasks[i].ID == taskID {
+			taskData.Tasks[i].StartTime = time.Now()
+			taskData.CurrentTaskID = taskID
+			fmt.Printf("Started timer for task: %s\n", taskData.Tasks[i].Description)
+			saveTaskData()
+			return
+		}
+	}
 
-    fmt.Printf("Task with ID %d not found\n", taskID)
+	fmt.Printf("Task with ID %d not found\n", taskID)
 }
 
 func stopTask() {
-    if taskData.CurrentTaskID == 0 {
-        fmt.Println("No task is currently running")
-        return
-    }
+	if taskData.CurrentTaskID == 0 {
+		fmt.Println("No task is currently running")
+		return
+	}
 
-    for i := range taskData.Tasks {
-        if taskData.Tasks[i].ID == taskData.CurrentTaskID {
-            duration := time.Since(taskData.Tasks[i].StartTime)
-            taskData.Tasks[i].TotalTime += duration
+	for i := range taskData.Tasks {
+		if taskData.Tasks[i].ID == taskData.CurrentTaskID {
+			duration := time.Since(taskData.Tasks[i].StartTime)
+			taskData.Tasks[i].TotalTime += duration
 
-            fmt.Printf("Stopped timer for task: %s\n", taskData.Tasks[i].Description)
-            fmt.Printf("Time spent: %s\n", duration.Round(time.Second))
+			fmt.Printf("Stopped timer for task: %s\n", taskData.Tasks[i].Description)
+			fmt.Printf("Time spent: %s\n", duration.Round(time.Second))
 
-            taskData.Tasks[i].StartTime = time.Time{}
-            taskData.CurrentTaskID = 0
+			taskData.Tasks[i].StartTime = time.Time{}
+			taskData.CurrentTaskID = 0
 
-            saveTaskData()
-            return
-        }
-    }
+			saveTaskData()
+			return
+		}
+	}
 
-    fmt.Println("Error: Current task not found in the task list")
+	fmt.Println("Error: Current task not found in the task list")
 }
 
 func addTask(name string) {
@@ -89,16 +89,16 @@ func addTask(name string) {
 }
 
 func renameTask(taskID int, newName string) {
-    for i := range taskData.Tasks {
-        if taskData.Tasks[i].ID == taskID {
-            oldName := taskData.Tasks[i].Description
-            taskData.Tasks[i].Description = newName
-            fmt.Printf("Task renamed from '%s' to '%s'\n", oldName, newName)
-            saveTaskData()
-            return
-        }
-    }
-    fmt.Printf("Task with ID %d not found\n", taskID)
+	for i := range taskData.Tasks {
+		if taskData.Tasks[i].ID == taskID {
+			oldName := taskData.Tasks[i].Description
+			taskData.Tasks[i].Description = newName
+			fmt.Printf("Task renamed from '%s' to '%s'\n", oldName, newName)
+			saveTaskData()
+			return
+		}
+	}
+	fmt.Printf("Task with ID %d not found\n", taskID)
 }
 
 func listTaskData() {
@@ -131,20 +131,20 @@ func printCurrentTask() {
 }
 
 func deleteTask(taskID int) {
-    for i, task := range taskData.Tasks {
-        if task.ID == taskID {
-            taskData.Tasks = append(taskData.Tasks[:i], taskData.Tasks[i+1:]...)
-            fmt.Printf("Task with ID %d has been deleted\n", taskID)
-            regenerateTaskIds()
-            saveTaskData()
-            return
-        }
-    }
-    fmt.Printf("Task with ID %d not found\n", taskID)
+	for i, task := range taskData.Tasks {
+		if task.ID == taskID {
+			taskData.Tasks = append(taskData.Tasks[:i], taskData.Tasks[i+1:]...)
+			fmt.Printf("Task with ID %d has been deleted\n", taskID)
+			regenerateTaskIds()
+			saveTaskData()
+			return
+		}
+	}
+	fmt.Printf("Task with ID %d not found\n", taskID)
 }
 
 func regenerateTaskIds() {
-    for i := range taskData.Tasks {
-        taskData.Tasks[i].ID = i + 1
-    }
+	for i := range taskData.Tasks {
+		taskData.Tasks[i].ID = i + 1
+	}
 }

@@ -103,9 +103,16 @@ func renameTask(taskID int, newName string) {
 
 func listTaskData() {
 	for _, task := range taskData.Tasks {
+		totalTime := task.TotalTime
+
+		// Add on current time
+		if task.ID == taskData.CurrentTaskID {
+			totalTime += time.Since(task.StartTime)
+		}
+
 		// Convert the duration to hours and minutes
-		hours := int(task.TotalTime.Hours())
-		minutes := int(task.TotalTime.Minutes()) % 60
+		hours := int(totalTime.Hours())
+		minutes := int(totalTime.Minutes()) % 60
 
 		// Format the time string
 		timeStr := fmt.Sprintf("%dh %dm", hours, minutes)
